@@ -18,7 +18,8 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20.18.0'
+        node-version: '18'
+        cache: 'npm'
         
     - name: Setup Java 17
       uses: actions/setup-java@v4
@@ -26,54 +27,37 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
         
-    - name: Verify environment
-      run: |
-        node --version
-        npm --version
-        java -version
-        
-    - name: Clean install dependencies
-      run: |
-        rm -rf node_modules package-lock.json
-        npm install
+    - name: Install dependencies
+      run: npm ci
       
     - name: Build Next.js app
-      run: |
-        npm run build
-        ls -la
-        echo "Contents of out directory:"
-        ls -la out/ || echo "out directory not found"
-        
+      run: npm run build
+      
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
+      
+    - name: Install Capacitor CLI globally
+      run: npm install -g @capacitor/cli@6.1.2
         
-    - name: Initialize Capacitor if needed
+    - name: Add Android platform
       run: |
         if [ ! -d "android" ]; then
-          npx cap add android
+          cap add android
         fi
         
     - name: Sync Capacitor
-      run: |
-        npx cap sync android
+      run: cap sync
         
     - name: Make gradlew executable
       run: chmod +x android/gradlew
       
-    - name: Clean and build APK
+    - name: Build APK
       run: |
         cd android
-        ./gradlew clean
-        ./gradlew assembleDebug --no-daemon --console=plain --stacktrace
-        
-    - name: Verify APK exists
-      run: |
-        echo "Looking for APK files:"
-        find android -name "*.apk" -type f
+        ./gradlew assembleDebug --no-daemon
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
       with:
-        name: nelotsavam-debug-apk
-        path: android/app/build/outputs/apk/debug/*.apk
-        retention-days: 30
+        name: nelotsavam-apk
+        path: android/app/build/outputs/apk/debug/app-debug.apk
