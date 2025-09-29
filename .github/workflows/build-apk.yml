@@ -18,7 +18,7 @@ jobs:
     - name: Setup Node.js
       uses: actions/setup-node@v4
       with:
-        node-version: '20'
+        node-version: '20.18.0'
         cache: 'npm'
         
     - name: Setup Java 17
@@ -27,14 +27,22 @@ jobs:
         distribution: 'temurin'
         java-version: '17'
         
+    - name: Verify Node.js version
+      run: |
+        node --version
+        npm --version
+        
     - name: Install dependencies
       run: npm ci
+      
+    - name: Install latest Capacitor CLI globally
+      run: npm install -g @capacitor/cli@latest
       
     - name: Build web app
       run: npm run build
       
     - name: Sync Capacitor
-      run: npx cap sync android
+      run: cap sync android
       
     - name: Make gradlew executable
       run: chmod +x android/gradlew
