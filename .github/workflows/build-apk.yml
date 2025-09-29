@@ -55,7 +55,7 @@ jobs:
         
     - name: Sync Capacitor
       run: |
-        npx cap sync android --no-build
+        npx cap sync android
         
     - name: Make gradlew executable
       run: chmod +x android/gradlew
