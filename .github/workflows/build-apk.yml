@@ -35,7 +35,10 @@ jobs:
       
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
-      
+      with:
+        api-level: 34
+        build-tools: 34.0.0
+        
     - name: Install Capacitor CLI globally
       run: npm install -g @capacitor/cli@6.1.2
         
@@ -51,10 +54,11 @@ jobs:
     - name: Make gradlew executable
       run: chmod +x android/gradlew
       
-    - name: Build APK
+    - name: Build APK with detailed logging
       run: |
         cd android
-        ./gradlew assembleDebug --no-daemon
+        ./gradlew clean
+        ./gradlew assembleDebug --no-daemon --info --stacktrace
         
     - name: Upload APK
       uses: actions/upload-artifact@v4
